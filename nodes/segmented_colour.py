@@ -104,15 +104,28 @@ def process_image(msg):
     gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
     drawImg = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
+    pub_image_debug0 = rospy.Publisher('armCamera/debug0', Image, queue_size=10)
+    image_message = bridge.cv2_to_imgmsg(drawImg, encoding="passthrough")
+    pub_image_debug0.publish(image_message)
+
     # Threshold the image
     threshVal = 75
     ret,thresh = cv2.threshold(gray, threshVal, 255, cv2.THRESH_BINARY_INV)
     drawImg = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+    
+    pub_image_debug1 = rospy.Publisher('armCamera/debug1', Image, queue_size=10)
+    image_message = bridge.cv2_to_imgmsg(drawImg, encoding="passthrough")
+    pub_image_debug1.publish(image_message)
+
 
     # Morphology open
     kernel = np.ones((5,5),np.uint8)
     opening = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
     drawImg = cv2.cvtColor(opening, cv2.COLOR_GRAY2BGR)
+
+    pub_image_debug2 = rospy.Publisher('armCamera/debug2', Image, queue_size=10)
+    image_message = bridge.cv2_to_imgmsg(drawImg, encoding="passthrough")
+    pub_image_debug2.publish(image_message)
 
     # Find Contours
     _, contours, hierarchy = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
